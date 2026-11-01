@@ -30,20 +30,12 @@
       "description": "API key quota."
     },
     {
-      "name": "Banana",
-      "description": "Create a Banana image with POST /v1/images/generations. Models are gemini-3.1-flash-image, gemini-nano-banana-2.1, and gemini-3-pro-image. The first two cost 4 quota. gemini-3-pro-image costs 6. Then poll GET /v1/tasks/{task_id} under Image."
-    },
-    {
       "name": "ChatGPT",
       "description": "Existing GPT Image generation and status routes."
     },
     {
-      "name": "Grok",
-      "description": "Create a Grok image with POST /v1/images/generations and model grok-imagine-image-quality. Quota is 2. Do not send size. Then poll GET /v1/tasks/{task_id} under Image."
-    },
-    {
       "name": "Image",
-      "description": "List models and fetch a task. Create a task under Grok or Banana. Both call POST /v1/images/generations."
+      "description": "List models, create a task with POST /v1/images/generations, and fetch the task. Grok uses model grok-imagine-image-quality. Banana uses gemini-3.1-flash-image, gemini-nano-banana-2.1, or gemini-3-pro-image."
     },
     {
       "name": "Midjourney",
@@ -286,7 +278,7 @@
     },
     "/v1/images/generations": {
       "post": {
-        "tags": ["Grok", "Banana"],
+        "tags": ["Image"],
         "summary": "Create image generation",
         "operationId": "createImageGeneration",
         "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2 and gpt-image-2.5: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
