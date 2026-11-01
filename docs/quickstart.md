@@ -8,4 +8,11 @@ Every request needs an `API-KEY` header.
 
 
 
-**BaseUrl**: https://api.aiairouter.com
+
+**ApiBaseUrl**： https://api.aiairouter.com
+
+**Pricing**： https://www.aiairouter.com/pricing
+
+**HomePage**：https://www.aiairouter.com
+
+**DashBoard**：https://www.aiairouter.com/dashboard
