@@ -33,8 +33,16 @@
       "description": "Existing GPT Image generation and status routes."
     },
     {
+      "name": "Grok",
+      "description": "Grok Imagine uses the shared Image routes. POST /v1/images/generations with model grok-imagine-image-quality. Quota is 2. Do not send size. Then poll GET /v1/tasks/{task_id}."
+    },
+    {
+      "name": "Banana",
+      "description": "Gemini image models, including Nano Banana. POST /v1/images/generations with model gemini-3.1-flash-image, gemini-nano-banana-2.1, or gemini-3-pro-image. gemini-3.1-flash-image and gemini-nano-banana-2.1 cost 4 quota. gemini-3-pro-image costs 6. Then poll GET /v1/tasks/{task_id}."
+    },
+    {
       "name": "Image",
-      "description": "Recommended image generation, model list, and task routes."
+      "description": "Shared routes for every model: list models, create a task, and fetch the task. Grok and Banana use these same routes."
     },
     {
       "name": "Account",
@@ -277,7 +285,7 @@
     },
     "/v1/images/generations": {
       "post": {
-        "tags": ["Image"],
+        "tags": ["Image", "Grok", "Banana"],
         "summary": "Create image generation",
         "operationId": "createImageGeneration",
         "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2 and gpt-image-2.5: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
@@ -387,7 +395,7 @@
     },
     "/v1/tasks/{task_id}": {
       "get": {
-        "tags": ["Image"],
+        "tags": ["Image", "Grok", "Banana"],
         "summary": "Get image task",
         "operationId": "getImageTask",
         "description": "Status endpoint for tasks created by POST /v1/images/generations.<br /><br />GPT Image, Grok, and Gemini return ImageTask: status is queued, processing, succeeded, or failed. The body includes the submitted prompt and parameters on every status. A succeeded task includes data[{ url }] and usage.cost.<br /><br />Midjourney returns MidjourneyTask, the same fields as POST /midjourney/v1/job-status, plus the submitted prompt, mode, and timeout. status is a number: 0 in progress, 1 succeeded, 2 failed. A succeeded task includes the grid, the four images, and usage.cost.",
