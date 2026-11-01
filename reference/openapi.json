@@ -286,7 +286,7 @@
     },
     "/v1/images/generations": {
       "post": {
-        "tags": ["Grok"],
+        "tags": ["Grok", "Banana"],
         "summary": "Create image generation",
         "operationId": "createImageGeneration",
         "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2 and gpt-image-2.5: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
@@ -327,107 +327,6 @@
                   "summary": "Gemini",
                   "value": {
                     "model": "gemini-3.1-flash-image",
-                    "prompt": "a dog play with a girl",
-                    "aspect_ratio": "3:4"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Task accepted",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageTaskQueued"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid model or parameter",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageApiError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageApiError"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Not enough quota",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageApiError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Concurrency limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImageApiError"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "CustomApiKey": []
-          }
-        ]
-      }
-    },
-    "/v1/images/generations/": {
-      "post": {
-        "tags": ["Banana"],
-        "summary": "Create Banana image",
-        "operationId": "createBananaImage",
-        "description": "Same route as POST /v1/images/generations. Send a Gemini image model.<br /><br />gemini-3.1-flash-image and gemini-nano-banana-2.1 cost 4 quota. gemini-3-pro-image costs 6. Do not send size. If aspect_ratio is omitted and a reference image is sent, output follows that image. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GeminiGeneration"
-              },
-              "examples": {
-                "flash": {
-                  "summary": "gemini-3.1-flash-image",
-                  "value": {
-                    "model": "gemini-3.1-flash-image",
-                    "prompt": "a dog play with a girl",
-                    "aspect_ratio": "3:4"
-                  }
-                },
-                "nanoBanana": {
-                  "summary": "gemini-nano-banana-2.1",
-                  "value": {
-                    "model": "gemini-nano-banana-2.1",
-                    "prompt": "a dog play with a girl",
-                    "aspect_ratio": "3:4"
-                  }
-                },
-                "pro": {
-                  "summary": "gemini-3-pro-image",
-                  "value": {
-                    "model": "gemini-3-pro-image",
                     "prompt": "a dog play with a girl",
                     "aspect_ratio": "3:4"
                   }
