@@ -1,10 +1,15 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "Image generation API. POST /v1/images/generations is the recommended entry for Midjourney, GPT Image, Grok, and Gemini models. The existing Midjourney and GPT routes remain available.",
+    "title": "aiairouter API",
+    "description": "# Quickstart\n\nEvery request needs an `API-KEY` header.\n\n1. Sign in at the [API Console](https://aiairouter.com/dashboard). Google sign-in is supported.\n2. A default `API-KEY` is created with the account. New accounts receive 10 quota as a trial balance.\n3. Send the key on every request: `API-KEY: YOUR_API_KEY`.\n\nThe full guide, including the first image request, is in the [Quickstart](https://docs.aiairouter.com/quickstart).\n\nImage generation API. POST /v1/images/generations is the recommended entry for Midjourney, GPT Image, Grok, and Gemini models. The existing Midjourney and GPT routes remain available.",
     "license": {
-      "name": "MIT"
+      "name": "MIT",
+      "url": "https://opensource.org/license/mit"
+    },
+    "contact": {
+      "email": "support@aiairouter.com",
+      "url": "https://www.aiairouter.com/contacts"
     },
     "version": "1.0.0"
   },
@@ -18,10 +23,29 @@
       "CustomApiKey": []
     }
   ],
+  "tags": [
+    {
+      "name": "Midjourney",
+      "description": "Existing Midjourney submit and status routes."
+    },
+    {
+      "name": "ChatGPT",
+      "description": "Existing GPT Image generation and status routes."
+    },
+    {
+      "name": "Image",
+      "description": "Recommended image generation, model list, and task routes."
+    },
+    {
+      "name": "Account",
+      "description": "API key quota."
+    }
+  ],
   "paths": {
     "/midjourney/v1/submit-jobs": {
       "post": {
         "tags": ["Midjourney"],
+        "operationId": "submitMidjourneyJob",
         "summary": "Submit Midjourney job",
         "description": "Existing Midjourney imagine endpoint. New integrations can use POST /v1/images/generations with model midjourney. Prompt flags such as --ar, --niji, --v, and --hd stay inside prompt. fast costs 5 quota, relaxed costs 3, and fast with --hd costs 7.",
         "requestBody": {
@@ -66,6 +90,7 @@
     "/midjourney/v1/job-status": {
       "post": {
         "tags": ["Midjourney"],
+        "operationId": "getMidjourneyJobStatus",
         "summary": "Get Midjourney job status",
         "description": "Existing Midjourney task result endpoint. Pass the taskIds returned by submit-jobs. New integrations can poll GET /v1/tasks/{task_id}.",
         "requestBody": {
@@ -119,6 +144,7 @@
     "/gpt/v1/job-status": {
       "post": {
         "tags": ["ChatGPT"],
+        "operationId": "getGptJobStatus",
         "summary": "Get GPT job status",
         "description": "Existing GPT image task result endpoint. Pass the taskIds returned by POST /gpt/v1/generations. New integrations can poll GET /v1/tasks/{task_id}.",
         "requestBody": {
@@ -172,6 +198,7 @@
     "/gpt/v1/generations": {
       "post": {
         "tags": ["ChatGPT"],
+        "operationId": "createGptImage",
         "summary": "Create GPT image",
         "description": "Existing GPT image endpoint. Supported models are gpt-image-2 and gpt-image-2.5. 1K costs 2 quota and 4K costs 4. New integrations can use POST /v1/images/generations with the same fields.",
         "requestBody": {
@@ -240,7 +267,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "CustomApiKey": []
+          }
+        ]
       }
     },
     "/v1/images/generations": {
@@ -345,7 +377,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "CustomApiKey": []
+          }
+        ]
       }
     },
     "/v1/tasks/{task_id}": {
@@ -443,12 +480,18 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "CustomApiKey": []
+          }
+        ]
       }
     },
     "/v1/account/info": {
       "get": {
         "tags": ["Account"],
+        "operationId": "getAccountQuota",
         "summary": "Get Quota",
         "description": "Get the remaining quota for the current API key.<br /><br />Rate limit: 10 requests per 60 seconds for each API key. When the limit is exceeded, the API returns HTTP 429 and a Retry-After header. Poll at most once every 6 seconds.",
         "responses": {
