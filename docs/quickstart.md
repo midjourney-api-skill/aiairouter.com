@@ -2,7 +2,7 @@
 
 Every request needs an `API-KEY` header.
 
-1. Sign in at the [API Console](https://aiairouter.com/dashboard). Google sign-in is supported.
+1. Sign in at the [DashBoard](https://aiairouter.com/dashboard). Google sign-in is supported.
 2. A default `API-KEY` is created with the account. New accounts receive 10 quota as a trial balance.
 3. Send the key on every request: `API-KEY: YOUR_API_KEY`.
 
