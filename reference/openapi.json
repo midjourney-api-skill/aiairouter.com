@@ -1,0 +1,1161 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI Plant Store",
+    "description": "Image generation API. POST /v1/images/generations is the recommended entry for Midjourney, GPT Image, Grok, and Gemini models. The existing Midjourney and GPT routes remain available.",
+    "license": {
+      "name": "MIT"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.aiairouter.com"
+    }
+  ],
+  "security": [
+    {
+      "CustomApiKey": []
+    }
+  ],
+  "paths": {
+    "/midjourney/v1/submit-jobs": {
+      "post": {
+        "tags": ["Midjourney"],
+        "summary": "Submit Midjourney job",
+        "description": "Existing Midjourney imagine endpoint. New integrations can use POST /v1/images/generations with model midjourney. Prompt flags such as --ar, --niji, --v, and --hd stay inside prompt. fast costs 5 quota, relaxed costs 3, and fast with --hd costs 7.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Create"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+         "security": [
+                {
+                "CustomApiKey": []
+                }
+         ]
+      }
+    },
+    "/midjourney/v1/job-status": {
+      "post": {
+        "tags": ["Midjourney"],
+        "summary": "Get Midjourney job status",
+        "description": "Existing Midjourney task result endpoint. Pass the taskIds returned by submit-jobs. New integrations can poll GET /v1/tasks/{task_id}.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type":"object",
+                "properties":{
+                  "taskIds": {
+                    "type":"array",
+                    "items":{
+                      "type":"string",
+                      "example":"MtAd7mCuc4YqK_a1iAQSW"
+                    }
+                  }
+                },
+                "required": ["taskIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatsRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+         "security": [
+                {
+                "CustomApiKey": []
+                }
+         ]
+      }
+    },
+    "/gpt/v1/job-status": {
+      "post": {
+        "tags": ["ChatGPT"],
+        "summary": "Get GPT job status",
+        "description": "Existing GPT image task result endpoint. Pass the taskIds returned by POST /gpt/v1/generations. New integrations can poll GET /v1/tasks/{task_id}.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type":"object",
+                "properties":{
+                  "taskIds": {
+                    "type":"array",
+                    "items":{
+                      "type":"string",
+                      "example":"MtAd7mCuc4YqK_a1iAQSW"
+                    }
+                  }
+                },
+                "required": ["taskIds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatsRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+         "security": [
+                {
+                "CustomApiKey": []
+                }
+         ]
+      }
+    },
+    "/gpt/v1/generations": {
+      "post": {
+        "tags": ["ChatGPT"],
+        "summary": "Create GPT image",
+        "description": "Existing GPT image endpoint. Supported models are gpt-image-2 and gpt-image-2.5. 1K costs 2 quota and 4K costs 4. New integrations can use POST /v1/images/generations with the same fields.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GptCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonRes"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+         "security": [
+                {
+                "CustomApiKey": []
+                }
+         ]
+      }
+    },
+    "/v1/models": {
+      "get": {
+        "tags": ["Image"],
+        "summary": "List models",
+        "operationId": "listImageModels",
+        "description": "List models accepted by POST /v1/images/generations, including parameters and default quota prices.",
+        "responses": {
+          "200": {
+            "description": "Model list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/images/generations": {
+      "post": {
+        "tags": ["Image"],
+        "summary": "Create image generation",
+        "operationId": "createImageGeneration",
+        "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2 and gpt-image-2.5: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageGenerationRequest"
+              },
+              "examples": {
+                "midjourney": {
+                  "summary": "Midjourney",
+                  "value": {
+                    "model": "midjourney",
+                    "prompt": "a boy play with a girl --niji 7 --ar 3:4",
+                    "mode": "fast"
+                  }
+                },
+                "gpt": {
+                  "summary": "GPT Image",
+                  "value": {
+                    "model": "gpt-image-2",
+                    "prompt": "draw a boy play with a girl",
+                    "aspect_ratio": "1:1",
+                    "size": "1K"
+                  }
+                },
+                "grok": {
+                  "summary": "Grok",
+                  "value": {
+                    "model": "grok-imagine-image-quality",
+                    "prompt": "a dog play with a girl",
+                    "aspect_ratio": "1:1"
+                  }
+                },
+                "gemini": {
+                  "summary": "Gemini",
+                  "value": {
+                    "model": "gemini-3.1-flash-image",
+                    "prompt": "a dog play with a girl",
+                    "aspect_ratio": "3:4"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageTaskQueued"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid model or parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Not enough quota",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Concurrency limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tasks/{task_id}": {
+      "get": {
+        "tags": ["Image"],
+        "summary": "Get image task",
+        "operationId": "getImageTask",
+        "description": "Status endpoint for tasks created by POST /v1/images/generations.<br /><br />GPT Image, Grok, and Gemini return ImageTask: status is queued, processing, succeeded, or failed. The body includes the submitted prompt and parameters on every status. A succeeded task includes data[{ url }] and usage.cost.<br /><br />Midjourney returns MidjourneyTask, the same fields as POST /midjourney/v1/job-status, plus the submitted prompt, mode, and timeout. status is a number: 0 in progress, 1 succeeded, 2 failed. A succeeded task includes the grid, the four images, and usage.cost.",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "description": "task_id returned by POST /v1/images/generations",
+            "schema": {
+              "type": "string",
+              "example": "MtAd7mCuc4YqK_a1iAQSW"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/ImageTask" },
+                    { "$ref": "#/components/schemas/MidjourneyTask" }
+                  ]
+                },
+                "examples": {
+                  "queued": {
+                    "summary": "Queued",
+                    "value": {
+                      "task_id": "MtAd7mCuc4YqK_a1iAQSW",
+                      "status": "queued",
+                      "model": "gemini-3.1-flash-image",
+                      "prompt": "a dog play with a girl",
+                      "aspect_ratio": "3:4"
+                    }
+                  },
+                  "succeeded": {
+                    "summary": "Succeeded",
+                    "value": {
+                      "task_id": "MtAd7mCuc4YqK_a1iAQSW",
+                      "status": "succeeded",
+                      "model": "gemini-3.1-flash-image",
+                      "prompt": "a dog play with a girl",
+                      "aspect_ratio": "3:4",
+                      "data": [
+                        {
+                          "url": "https://cdn.example.com/image.png"
+                        }
+                      ],
+                      "usage": {
+                        "cost": 4
+                      }
+                    }
+                  },
+                  "failed": {
+                    "summary": "Failed",
+                    "value": {
+                      "task_id": "MtAd7mCuc4YqK_a1iAQSW",
+                      "status": "failed",
+                      "model": "gemini-3.1-flash-image",
+                      "prompt": "a dog play with a girl",
+                      "aspect_ratio": "3:4",
+                      "error": {
+                        "message": "Generation failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImageApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/info": {
+      "get": {
+        "tags": ["Account"],
+        "summary": "Get Quota",
+        "description": "Get the remaining quota for the current API key.<br /><br />Rate limit: 10 requests per 60 seconds for each API key. When the limit is exceeded, the API returns HTTP 429 and a Retry-After header. Poll at most once every 6 seconds.",
+        "responses": {
+          "200": {
+            "description": "Request successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountInfoRes"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 401
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "API KEY error, please check your api key"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests. Retry after the number of seconds in the Retry-After header.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before the next request",
+                "schema": {
+                  "type": "integer",
+                  "example": 12
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 429
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Too many requests. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CustomApiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "webhooks": {
+    "/plant/webhook": {
+      "post": {
+        "description": "Information about a new plant added to the store",
+        "requestBody": {
+          "description": "Plant added to the store",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommonRes"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return a 200 status to indicate that the data was received successfully"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+       "Create":{
+            "required": [
+              "prompt"
+            ],
+            "type": "object",
+            "properties": {
+                "prompt": {
+                    "description": "Prompt",
+                    "type": "string",
+                    "example":"a boy play with a girl --niji 7"
+                   },
+                "mode": {
+                    "type": "string",
+                    "example": "fast",
+                    "description": "Speed mode<br />Default: fast",
+                    "enum": [
+                        "relaxed",
+                        "fast"
+                    ]
+                },
+                "hookUrl":{
+                    "type": "string",
+                    "example": "https://api.example.com/webhook",
+                    "description": "Callback notification URL"
+                },
+                "timeout":{
+                    "type": "integer",
+                    "example": 600,
+                    "description": "Task timeout<br />- Unit: seconds<br />- Range: 300 - 1200<br />- Default: 600"
+                }
+
+            }
+       }, 
+       "GptCreate":{
+            "required": [
+              "prompt"
+            ],
+            "type": "object",
+            "properties": {
+                "prompt": {
+                    "description": "Text prompt for image generation.<br /><br />Since this is a reverse-engineered model, it's recommended to include keywords in your prompt such as:<br />- \"draw a xxx\"<br />- \"generate a xxx\"<br /><br />Language is not restricted; OpenAI itself supports multilingual models with excellent Chinese support.",
+                    "type": "string",
+                    "example":"draw a boy play with a girl"
+                },
+                "model": {
+                    "type": "string",
+                    "example": "gpt-image-2",
+                    "description": "Supported models: gpt-image-2, gpt-image-2.5. Required by the endpoint.",
+                    "enum": [
+                        "gpt-image-2",
+                        "gpt-image-2.5"
+                    ]
+                },
+                 "referImages": {
+                    "type": "array",
+                    "example": ["https://example.com/image.png","https://example.com/image.png"],
+                    "description": "Reference image array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                  "aspect_ratio": {
+                    "type": "string",
+                    "example": "1:1",
+                    "description": "Support model: gpt-image-2<br /><br />Available options:<br />- 1:1<br />- 1:2<br />- 2:1<br />- 3:4<br />- 4:3<br />- 16:9<br />- 9:16",
+                    "enum": [
+                        "1:1",
+                        "1:2",
+                        "2:1",
+                        "3:4",
+                        "4:3",
+                        "16:9",
+                        "9:16"
+                    ]
+                },
+                "size": {
+                    "type": "string",
+                    "example": "1K",
+                    "description": "Support model: gpt-image-2<br /><br />Available options: 1K, 4K<br />Default: 1K<br /><br />4K is better at keeping other areas unchanged in image editing scenarios",
+                    "enum": [
+                        "1K",
+                        "4K"
+                    ]
+                },
+                "output_size": {
+                    "type": "string",
+                    "example": "1920x1080",
+                    "description": "Support model: gpt-image-2. Custom output width and height in WIDTHxHEIGHT format, e.g. \"1920x1080\". Only takes effect when size is \"4K\"; ignored for 1K.<br /><br />A parsed value overrides aspect_ratio. Unparseable values are ignored and the request keeps aspect_ratio sizing.<br /><br />The server auto-corrects a parsed value:<br />- both sides snapped to multiples of 16<br />- longest edge ≤ 3840<br />- aspect ratio clamped to 1:3–3:1<br />- total pixels clamped to 655360–8294400<br /><br />Examples:<br />- \"100x100\" → 816x816<br />- \"1920x1080\" → 1920x1088<br />- \"5000x100\" → 3840x1280<br />- \"10000x10000\" → 2880x2880"
+                },
+                "hookUrl":{
+                    "type": "string",
+                    "example": "https://api.example.com/webhook",
+                    "description": "Callback notification URL"
+                }
+            }
+       }, 
+      "CommonRes": {
+        "required": [
+          "status",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Status code:<br />- 0: success<br />- 1001: quota not enough<br />- 1002: concurrency limit, max 30",
+            "type": "integer",
+            "example":0
+          },
+          "message": {
+            "description": "Message",
+            "type": "string",
+            "example":"success"
+          },
+          "data":{
+            "type":"object",
+            "properties":{
+                "taskId":{
+                    "type":"string",
+                    "example":"MtAd7mCuc4YqK_a1iAQSW"
+                }
+            }
+          }
+        }
+      },
+        "JobStatsRes": {
+        "required": [
+          "status",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Status code, 0: success;",
+            "type": "integer",
+            "example":0
+          },
+          "message": {
+            "description": "Message",
+            "type": "string",
+            "example":"success"
+          },
+          "data":{
+            "type":"array",
+              "items":{
+                "type":"object",
+                "properties":{
+                    "status":{
+                        "type":"integer",
+                        "description": "Status code:<br />- 0: doing<br />- 1: success<br />- 2: fail",
+                        "example":1
+                    },
+                     "taskId":{
+                        "type":"string",
+                        "example":"MtAd7mCuc4YqK_a1iAQSW"
+                    },
+                    "image":{
+                        "type":"string",
+                        "example":"https://cdn.midjourney.com/089b3f2e-b120-4c30-8c1e-6bb02851f661/grid_0.png"
+                    },
+                    "jobId": {
+                        "type":"string",
+                        "example":"089b3f2e-b120-4c30-8c1e-6bb02851f661"
+                    },
+                    "images": {
+                      "type":"array",
+                      "items":{
+                        "type":"string",
+                        "description": "midjourney cdn url, which can open in browser but cannot be fetched via API",
+                        "example":"https://cdn.midjourney.com/089b3f2e-b120-4c30-8c1e-6bb02851f661/0_0.png"
+                      }
+                    },  
+                    "imgUrls": {
+                      "type":"array",
+                      "items":{
+                        "type":"string",
+                        "description": "image cdn url, which can be fetched via API, it will expire in about a month, please save it as soon as possible. There are two formats, please note the difference",
+                        "example":"https://c1.tujiangjiang.com/58b1ffa1-7d11-4486-92aa-71c2cb88d30e_0_0.png, https://c2.tujiangjiang.com/s1/s8/58b1ffa1-7d11-4486-92aa-71c2cb88d30e/0_0.png"
+                      }
+                    },  
+                    "prompt": {
+                        "type":"string",
+                        "description": "Prompt",
+                        "example":"a dog play with a boy --niji 6 --ar 9:16"
+                    },
+                    "mjPrompt": {
+                        "type":"string",
+                        "description": "Prompt from Midjourney",
+                        "example":"a dog play with a boy --niji 6 --ar 9:16"
+                    },
+                    "createdAt": {
+                        "type":"integer",
+                        "example":1766915367000
+                    },
+                    "meta": {
+                      "type":"object",
+                      "properties":{
+                        "width": {
+                          "type":"integer",
+                          "example":816
+                        },
+                        "height": {
+                        "type":"integer",
+                        "example":1456
+                      }
+                    }
+                }
+            }
+             }
+          }
+        }
+      },
+      "AccountInfoRes": {
+        "required": [
+          "status",
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Status code:<br />- 0: success",
+            "type": "integer",
+            "example": 0
+          },
+          "msg": {
+            "description": "Message",
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "quota": {
+                "type": "integer",
+                "description": "Remaining quota of the current account",
+                "example": 120
+              }
+            }
+          }
+        }
+      },
+      "ImageGenerationRequest": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/MidjourneyGeneration" },
+          { "$ref": "#/components/schemas/GptGeneration" },
+          { "$ref": "#/components/schemas/GrokGeneration" },
+          { "$ref": "#/components/schemas/GeminiGeneration" }
+        ],
+        "discriminator": {
+          "propertyName": "model"
+        }
+      },
+      "MidjourneyGeneration": {
+        "type": "object",
+        "required": ["model", "prompt"],
+        "description": "Midjourney on POST /v1/images/generations. Put aspect ratio and reference images in prompt, for example --ar 3:4.",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": ["midjourney"],
+            "example": "midjourney"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Prompt, including Midjourney flags such as --niji, --v, --ar, and --hd.",
+            "example": "a boy play with a girl --niji 7 --ar 3:4"
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["relaxed", "fast"],
+            "description": "Speed mode. Default: fast. relaxed costs 3 quota, fast costs 5, and fast with --hd in the prompt costs 7.",
+            "example": "fast"
+          },
+          "timeout": {
+            "type": "integer",
+            "minimum": 300,
+            "maximum": 1200,
+            "description": "Task timeout in seconds. Range: 300-1200.",
+            "example": 600
+          },
+          "hookUrl": {
+            "$ref": "#/components/schemas/HookUrl"
+          }
+        }
+      },
+      "GptGeneration": {
+        "type": "object",
+        "required": ["model", "prompt"],
+        "description": "GPT Image on POST /v1/images/generations. Same fields as POST /gpt/v1/generations.",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": ["gpt-image-2", "gpt-image-2.5"],
+            "example": "gpt-image-2"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "draw a boy play with a girl"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": ["1:1", "1:2", "2:1", "3:4", "4:3", "16:9", "9:16"],
+            "description": "Default: 1:1.",
+            "example": "1:1"
+          },
+          "size": {
+            "type": "string",
+            "enum": ["1K", "4K"],
+            "description": "Default: 1K. 1K costs 2 quota. 4K costs 4 quota.",
+            "example": "1K"
+          },
+          "output_size": {
+            "type": "string",
+            "description": "WIDTHxHEIGHT, for example 1920x1080. Applied only when size is 4K. Ignored for 1K.",
+            "example": "1920x1080"
+          },
+          "referImages": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Reference image URLs.",
+            "example": ["https://example.com/image.png"]
+          },
+          "hookUrl": {
+            "$ref": "#/components/schemas/HookUrl"
+          }
+        }
+      },
+      "GrokGeneration": {
+        "type": "object",
+        "required": ["model", "prompt"],
+        "description": "Grok Imagine Image Quality. Send model grok-imagine-image-quality. Quota is 2. Do not send size. aspect_ratio accepts 1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, and 21:9. Default is 1:1. At most 4 reference images.",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": ["grok-imagine-image-quality"],
+            "example": "grok-imagine-image-quality"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "a dog play with a girl"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": ["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"],
+            "description": "Default: 1:1.",
+            "example": "1:1"
+          },
+          "referImages": {
+            "type": "array",
+            "maxItems": 4,
+            "items": { "type": "string" },
+            "description": "Reference image URLs. At most 4.",
+            "example": ["https://example.com/image.png"]
+          },
+          "hookUrl": {
+            "$ref": "#/components/schemas/HookUrl"
+          }
+        }
+      },
+      "GeminiGeneration": {
+        "type": "object",
+        "required": ["model", "prompt"],
+        "description": "Gemini image models. gemini-3.1-flash-image and gemini-nano-banana-2.1 cost 4 quota. gemini-3-pro-image costs 6. There is no size or 4K price. If aspect_ratio is omitted and a reference image is sent, output follows that image.",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": ["gemini-3.1-flash-image", "gemini-nano-banana-2.1", "gemini-3-pro-image"],
+            "example": "gemini-3.1-flash-image"
+          },
+          "prompt": {
+            "type": "string",
+            "example": "a dog play with a girl"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "enum": ["1:1", "3:2", "2:3", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"],
+            "example": "3:4"
+          },
+          "referImages": {
+            "type": "array",
+            "maxItems": 4,
+            "items": { "type": "string" },
+            "description": "Reference image URLs. At most 4.",
+            "example": ["https://example.com/image.png"]
+          },
+          "hookUrl": {
+            "$ref": "#/components/schemas/HookUrl"
+          }
+        }
+      },
+      "HookUrl": {
+        "type": "string",
+        "description": "Optional http(s) callback URL. The body matches GET /v1/tasks/{task_id}, including the submitted prompt and parameters, plus data, usage, or error.",
+        "example": "https://api.example.com/webhook"
+      },
+      "ImageTaskQueued": {
+        "type": "object",
+        "required": ["task_id", "status", "model"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "example": "MtAd7mCuc4YqK_a1iAQSW"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued"],
+            "example": "queued"
+          },
+          "model": {
+            "type": "string",
+            "example": "gemini-3.1-flash-image"
+          }
+        }
+      },
+      "ImageTask": {
+        "type": "object",
+        "description": "GPT Image, Grok, and Gemini task. Parameters declared for that model are returned with the same names. hookUrl is not returned.",
+        "required": ["task_id", "status", "model"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "example": "MtAd7mCuc4YqK_a1iAQSW"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "processing", "succeeded", "failed"],
+            "example": "succeeded"
+          },
+          "model": {
+            "type": "string",
+            "description": "Public model id stored for the task.",
+            "example": "gemini-3.1-flash-image"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Prompt submitted for this task.",
+            "example": "a dog play with a girl"
+          },
+          "aspect_ratio": {
+            "type": "string",
+            "description": "Submitted aspect ratio. Grok uses 1:1 when the request omitted it. Gemini omits this field when the request omitted it.",
+            "example": "3:4"
+          },
+          "size": {
+            "type": "string",
+            "enum": ["1K", "4K"],
+            "description": "GPT Image only. The submitted size. Default: 1K."
+          },
+          "output_size": {
+            "type": "string",
+            "description": "GPT Image only. Present when a 4K output_size was applied.",
+            "example": "1920x1080"
+          },
+          "referImages": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Reference image URLs submitted with the task."
+          },
+          "data": {
+            "type": "array",
+            "description": "Present when status is succeeded.",
+            "items": {
+              "type": "object",
+              "required": ["url"],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "example": "https://cdn.example.com/image.png"
+                }
+              }
+            }
+          },
+          "error": {
+            "type": "object",
+            "description": "Present when status is failed.",
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Generation failed"
+              }
+            }
+          },
+          "usage": {
+            "type": "object",
+            "description": "Present when status is succeeded. cost is the quota charged for this task.",
+            "required": ["cost"],
+            "properties": {
+              "cost": {
+                "type": "integer",
+                "example": 4
+              }
+            }
+          }
+        }
+      },
+      "MidjourneyTask": {
+        "type": "object",
+        "description": "Midjourney result from GET /v1/tasks/{task_id}. Same item shape as POST /midjourney/v1/job-status.",
+        "required": ["taskId", "status"],
+        "properties": {
+          "taskId": { "type": "string", "example": "MtAd7mCuc4YqK_a1iAQSW" },
+          "status": {
+            "type": "integer",
+            "description": "0 in progress, 1 succeeded, 2 failed. Other stored failure codes are returned as-is.",
+            "example": 1
+          },
+          "createdAt": { "type": "integer", "description": "Unix time in milliseconds." },
+          "jobId": { "type": "string" },
+          "prompt": { "type": "string", "description": "Prompt submitted for this task." },
+          "mode": { "type": "string", "enum": ["relaxed", "fast"], "description": "Submitted speed mode." },
+          "timeout": { "type": "integer", "description": "Submitted timeout in seconds, when the request set one." },
+          "mjPrompt": { "type": "string" },
+          "image": { "type": "string", "description": "Grid image URL." },
+          "imageUrl": { "type": "string", "description": "CDN grid image URL." },
+          "images": { "type": "array", "items": { "type": "string" }, "description": "Four single-image URLs." },
+          "imgUrls": { "type": "array", "items": { "type": "string" }, "description": "Four CDN single-image URLs." },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "width": { "type": "integer" },
+              "height": { "type": "integer" }
+            }
+          },
+          "failReason": { "type": "string", "description": "Present when status is 2." },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "cost": { "type": "integer", "description": "Quota charged for this task.", "example": 5 }
+            }
+          }
+        }
+      },
+      "ModelList": {
+        "type": "object",
+        "required": ["object", "data"],
+        "properties": {
+          "object": {
+            "type": "string",
+            "example": "list"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "example": "gemini-3.1-flash-image" },
+                "object": { "type": "string", "example": "model" },
+                "description": { "type": "string" },
+                "params": { "type": "array", "items": { "type": "object" } },
+                "price": {
+                  "type": "object",
+                  "description": "Default quota. GPT uses standard and hd. Midjourney uses relaxed, fast, and fast_hd. Grok and Gemini use standard."
+                }
+              }
+            }
+          }
+        }
+      },
+      "ImageApiError": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["message", "type"],
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Unsupported model: demo. See GET /v1/models."
+              },
+              "type": {
+                "type": "string",
+                "enum": ["invalid_request_error", "authentication_error", "insufficient_quota", "rate_limit_error", "api_error"],
+                "example": "invalid_request_error"
+              },
+              "param": {
+                "type": "string",
+                "example": "model"
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "required": [
+          "error",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "integer",
+            "format": "int32",
+            "example":1001
+          },
+          "message": {
+            "type": "string",
+            "example":"quota not enough"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "CustomApiKey":{
+        "type": "apiKey",
+        "in": "header",
+        "name": "API-KEY",
+        "description": "You can obtain your API key from the <a href='https://aiairouter.com/dashboard' target='_blank'>Midjourney-api Dashboard</a>."
+      }
+    }
+  }
+} 
