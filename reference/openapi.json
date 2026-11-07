@@ -201,7 +201,7 @@
         "tags": ["ChatGPT"],
         "operationId": "createGptImage",
         "summary": "Create GPT image",
-        "description": "Existing GPT image endpoint. Supported models are gpt-image-2 and gpt-image-2.5. 1K costs 2 quota and 4K costs 4. New integrations can use POST /v1/images/generations with the same fields.",
+        "description": "Existing GPT image endpoint. Supported models are gpt-image-2, gpt-image-2.5, and gpt-image-2.6. 1K costs 2 quota and 4K costs 4. New integrations can use POST /v1/images/generations with the same fields.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -281,7 +281,7 @@
         "tags": ["Image"],
         "summary": "Create image generation",
         "operationId": "createImageGeneration",
-        "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2 and gpt-image-2.5: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
+        "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2, gpt-image-2.5, and gpt-image-2.6: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
         "requestBody": {
           "required": true,
           "content": {
@@ -613,10 +613,11 @@
                 "model": {
                     "type": "string",
                     "example": "gpt-image-2",
-                    "description": "Supported models: gpt-image-2, gpt-image-2.5. Required by the endpoint.",
+                    "description": "Supported models: gpt-image-2, gpt-image-2.5, gpt-image-2.6. Required by the endpoint.",
                     "enum": [
                         "gpt-image-2",
-                        "gpt-image-2.5"
+                        "gpt-image-2.5",
+                        "gpt-image-2.6"
                     ]
                 },
                  "referImages": {
@@ -857,7 +858,7 @@
         "properties": {
           "model": {
             "type": "string",
-            "enum": ["gpt-image-2", "gpt-image-2.5"],
+            "enum": ["gpt-image-2", "gpt-image-2.5", "gpt-image-2.6"],
             "example": "gpt-image-2"
           },
           "prompt": {
