@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "aiairouter API",
-    "description": "# Quickstart\n\nEvery request needs an `API-KEY` header.\n\n1. Sign in at the [API Console](https://aiairouter.com/dashboard). Google sign-in is supported.\n2. A default `API-KEY` is created with the account. New accounts receive 10 quota as a trial balance.\n3. Send the key on every request: `API-KEY: YOUR_API_KEY`.\n\nThe full guide, including the first image request, is in the [Quickstart](https://docs.aiairouter.com/quickstart).\n\nImage generation API. POST /v1/images/generations is the recommended entry for Midjourney, GPT Image, Grok, and Gemini models. The existing Midjourney and GPT routes remain available.",
+    "description": "# Quickstart\n\nImage requests use an `API-KEY` header. Chat requests also accept `Authorization: Bearer YOUR_API_KEY`.\n\n1. Sign in at the [API Console](https://aiairouter.com/dashboard). Google sign-in is supported.\n2. A default `API-KEY` is created with the account. New accounts receive 10 quota as a trial balance.\n3. Send the key on every request: `API-KEY: YOUR_API_KEY`. For chat, `Authorization: Bearer YOUR_API_KEY` is equivalent.\n\nThe full guide, including the first image request, is in the [Quickstart](https://docs.aiairouter.com/quickstart).\n\nImage generation API. POST /v1/images/generations is the recommended entry for Midjourney, GPT Image, Grok, and Gemini models. The existing Midjourney and GPT routes remain available.\n\nChat API. POST /v1/chat/completions is an OpenAI-compatible chat endpoint. Set the OpenAI SDK base URL to `https://api.aiairouter.com/v1`.",
     "license": {
       "name": "MIT",
       "url": "https://opensource.org/license/mit"
@@ -30,6 +30,10 @@
       "description": "API key quota."
     },
     {
+      "name": "Chat",
+      "description": "OpenAI-compatible chat completions. Billing is per token in quota."
+    },
+    {
       "name": "ChatGPT",
       "description": "Existing GPT Image generation and status routes."
     },
@@ -43,6 +47,129 @@
     }
   ],
   "paths": {
+    "/v1/chat/completions": {
+      "post": {
+        "tags": ["Chat"],
+        "operationId": "createChatCompletion",
+        "summary": "Create chat completion",
+        "description": "OpenAI-compatible chat completion. A successful call returns the completion JSON, or an SSE stream when `stream` is true.<br /><br />Auth: `Authorization: Bearer YOUR_API_KEY`, a raw `Authorization` value, or an `API-KEY` header. A `Bearer` prefix is stripped. The key IP allowlist still applies.<br /><br />`model` is required. Any other model returns HTTP 400 with `error` set to `This model is temporarily not supported.`<br /><br />Quota must be greater than 5 before the call. Otherwise the response is HTTP 402 and the body is `{ \"status\": 1001, \"code\": 1001, \"message\": \"Quota must be greater than 5.\" }`. A missing or invalid key is HTTP 401. An IP that is not allowed is HTTP 403. After a billed call, quota is deducted from token usage and the balance may go negative. 1 USD = 130 quota. The request is logged immediately. The token bill is filled in when it becomes available. A call whose bill never arrives stays in the log with zero quota and is not deducted.<br /><br />Prices are USD per 1 million tokens after discount. Cache reads use the cache price. Prompt tokens above 272K bill input and cache at 2× and output at 1.5×.<br /><br />| Model | Input | Cache read | Output | Discount |<br />| --- | --- | --- | --- | --- |<br />| gpt-6.1-sol | $2 | $0.10 | $10 | 0.21 |<br />| gpt-6.1-terra | $1 | $0.05 | $5 | 0.17 |<br />| gpt-6-sol | $2 | $0.20 | $10 | 0.21 |<br />| gpt-6-astra | $10 | $1 | $50 | 0.24 |<br />| gpt-6-luna | $0.10 | $0.01 | $0.50 | 0.50 |<br />| gpt-5.6-sol | $5 | $0.50 | $30 | 0.21 |",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              },
+              "example": {
+                "model": "gpt-6-sol",
+                "stream": true,
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Hello"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chat completion JSON, or an SSE stream when stream is true.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              },
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "OpenAI SSE chunks when stream is true."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "integer", "example": 401 },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Quota is not greater than 5.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "integer", "example": 1001 },
+                    "code": { "type": "integer", "example": 1001 },
+                    "message": { "type": "string", "example": "Quota must be greater than 5." }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The client IP is not on the API key allowlist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "integer", "example": 403 },
+                    "message": { "type": "string", "example": "Permission denied" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing model, or a model that is not supported.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatRouteError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Service error. Please try again later.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Service error. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "CustomApiKey": []
+          }
+        ]
+      }
+    },
     "/midjourney/v1/submit-jobs": {
       "post": {
         "tags": ["Midjourney"],
@@ -1164,6 +1291,102 @@
           "message": {
             "type": "string",
             "example":"quota not enough"
+          }
+        }
+      },
+      "ChatCompletionRequest": {
+        "type": "object",
+        "required": ["model", "messages"],
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Chat model id. Copy this value into the request.",
+            "enum": [
+              "gpt-6.1-sol",
+              "gpt-6.1-terra",
+              "gpt-6-sol",
+              "gpt-6-astra",
+              "gpt-6-luna",
+              "gpt-5.6-sol"
+            ],
+            "example": "gpt-6-sol"
+          },
+          "messages": {
+            "type": "array",
+            "description": "OpenAI chat messages.",
+            "items": {
+              "type": "object",
+              "required": ["role", "content"],
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": ["system", "user", "assistant", "tool"]
+                },
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "stream": {
+            "type": "boolean",
+            "description": "When true, the response is an SSE stream.",
+            "default": false
+          }
+        }
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "description": "Successful bodies match the OpenAI chat completion object. This schema only lists the fields clients use to detect an error body.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string",
+            "example": "chat.completion"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "status": {
+            "type": "integer",
+            "description": "Present on auth or quota failure. 401 invalid key, 403 IP denied, 1001 quota too low."
+          },
+          "code": {
+            "type": "integer",
+            "example": 1001
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ChatRouteError": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "This model is temporarily not supported."
+          },
+          "path": {
+            "type": "string",
+            "example": "/v1/chat/completions"
+          },
+          "method": {
+            "type": "string",
+            "example": "POST"
+          },
+          "model": {
+            "type": "string",
+            "description": "Present when the model is not supported."
           }
         }
       }
