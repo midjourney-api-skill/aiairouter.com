@@ -52,7 +52,7 @@
         "tags": ["Chat"],
         "operationId": "createChatCompletion",
         "summary": "Create chat completion",
-        "description": "OpenAI-compatible chat completion. A successful call returns the completion JSON, or an SSE stream when `stream` is true.<br /><br />Auth: `Authorization: Bearer YOUR_API_KEY`, a raw `Authorization` value, or an `API-KEY` header. A `Bearer` prefix is stripped. The key IP allowlist still applies.<br /><br />`model` is required. Any other model returns HTTP 400 with `error` set to `This model is temporarily not supported.`<br /><br />Quota must be greater than 5 before the call. Otherwise the response is HTTP 402 and the body is `{ \"status\": 1001, \"code\": 1001, \"message\": \"Quota must be greater than 5.\" }`. A missing or invalid key is HTTP 401. An IP that is not allowed is HTTP 403. After a billed call, quota is deducted from token usage and the balance may go negative. 1 USD = 130 quota. The request is logged immediately. The token bill is filled in when it becomes available. A call whose bill never arrives stays in the log with zero quota and is not deducted.<br /><br />Prices are USD per 1 million tokens after discount. Cache reads use the cache price. Prompt tokens above 272K bill input and cache at 2× and output at 1.5×.<br /><br />| Model | Input | Cache read | Output | Discount |<br />| --- | --- | --- | --- | --- |<br />| gpt-6.1-sol | $2 | $0.10 | $10 | 0.21 |<br />| gpt-6.1-terra | $1 | $0.05 | $5 | 0.17 |<br />| gpt-6-sol | $2 | $0.20 | $10 | 0.21 |<br />| gpt-6-astra | $10 | $1 | $50 | 0.24 |<br />| gpt-6-luna | $0.10 | $0.01 | $0.50 | 0.50 |<br />| gpt-5.6-sol | $5 | $0.50 | $30 | 0.21 |",
+        "description": "OpenAI-compatible chat completion. A successful call returns the completion JSON, or an SSE stream when `stream` is true.<br /><br />Auth: `Authorization: Bearer YOUR_API_KEY`, a raw `Authorization` value, or an `API-KEY` header. A `Bearer` prefix is stripped. The key IP allowlist still applies.<br /><br />`model` is required. Any other model returns HTTP 400 with `error` set to `This model is temporarily not supported.`<br /><br />Quota must be greater than 5 before the call. Otherwise the response is HTTP 402 and the body is `{ \"status\": 1001, \"code\": 1001, \"message\": \"Quota must be greater than 5.\" }`. A missing or invalid key is HTTP 401. An IP that is not allowed is HTTP 403. After a billed call, quota is deducted from token usage and the balance may go negative. The request is logged immediately. The token bill is filled in when it becomes available. A call whose bill never arrives stays in the log with zero quota and is not deducted.",
         "requestBody": {
           "required": true,
           "content": {
@@ -62,7 +62,7 @@
               },
               "example": {
                 "model": "gpt-6-sol",
-                "stream": true,
+                "stream": false,
                 "messages": [
                   {
                     "role": "user",
@@ -175,7 +175,7 @@
         "tags": ["Midjourney"],
         "operationId": "submitMidjourneyJob",
         "summary": "Submit Midjourney job",
-        "description": "Existing Midjourney imagine endpoint. New integrations can use POST /v1/images/generations with model midjourney. Prompt flags such as --ar, --niji, --v, and --hd stay inside prompt. fast costs 5 quota, relaxed costs 3, and fast with --hd costs 7.",
+        "description": "Existing Midjourney imagine endpoint. New integrations can use POST /v1/images/generations with model midjourney. Prompt flags such as --ar, --niji, --v, and --hd stay inside prompt.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -328,7 +328,7 @@
         "tags": ["ChatGPT"],
         "operationId": "createGptImage",
         "summary": "Create GPT image",
-        "description": "Existing GPT image endpoint. Supported models are gpt-image-2, gpt-image-2.5, and gpt-image-2.6. 1K costs 2 quota and 4K costs 4. New integrations can use POST /v1/images/generations with the same fields.",
+        "description": "Existing GPT image endpoint. Supported models are gpt-image-2, gpt-image-2.5, and gpt-image-2.6. New integrations can use POST /v1/images/generations with the same fields.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -373,7 +373,7 @@
         "tags": ["Image"],
         "summary": "List models",
         "operationId": "listImageModels",
-        "description": "List models accepted by POST /v1/images/generations, including parameters and default quota prices.",
+        "description": "List models accepted by POST /v1/images/generations, including parameters.",
         "responses": {
           "200": {
             "description": "Model list",
@@ -408,7 +408,7 @@
         "tags": ["Image"],
         "summary": "Create image generation",
         "operationId": "createImageGeneration",
-        "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Quota:<br />- midjourney: relaxed 3, fast 5, fast with --hd in the prompt 7<br />- gpt-image-2, gpt-image-2.5, and gpt-image-2.6: 1K is 2, 4K is 4<br />- grok-imagine-image-quality: 2<br />- gemini-3.1-flash-image: 4<br />- gemini-nano-banana-2.1: 4<br />- gemini-3-pro-image: 6<br /><br />Grok and Gemini have no 4K price and do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
+        "description": "Recommended create endpoint for Midjourney, GPT Image, Grok, and Gemini image models.<br /><br />Send a flat JSON body. Unknown fields return HTTP 400. There is no nested options object.<br /><br />Grok and Gemini do not accept size. A successful call returns immediately with status queued. Poll GET /v1/tasks/{task_id}, or set hookUrl to receive the same task body.",
         "requestBody": {
           "required": true,
           "content": {
@@ -963,7 +963,7 @@
           "mode": {
             "type": "string",
             "enum": ["relaxed", "fast"],
-            "description": "Speed mode. Default: fast. relaxed costs 3 quota, fast costs 5, and fast with --hd in the prompt costs 7.",
+            "description": "Speed mode. Default: fast.",
             "example": "fast"
           },
           "timeout": {
@@ -1001,7 +1001,7 @@
           "size": {
             "type": "string",
             "enum": ["1K", "4K"],
-            "description": "Default: 1K. 1K costs 2 quota. 4K costs 4 quota.",
+            "description": "Default: 1K.",
             "example": "1K"
           },
           "output_size": {
@@ -1023,7 +1023,7 @@
       "GrokGeneration": {
         "type": "object",
         "required": ["model", "prompt"],
-        "description": "Grok Imagine Image Quality. Send model grok-imagine-image-quality. Quota is 2. Do not send size. aspect_ratio accepts 1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, and 21:9. Default is 1:1. At most 4 reference images.",
+        "description": "Grok Imagine Image Quality. Send model grok-imagine-image-quality. Do not send size. aspect_ratio accepts 1:1, 3:2, 2:3, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, and 21:9. Default is 1:1. At most 4 reference images.",
         "properties": {
           "model": {
             "type": "string",
@@ -1055,7 +1055,7 @@
       "GeminiGeneration": {
         "type": "object",
         "required": ["model", "prompt"],
-        "description": "Gemini image models. gemini-3.1-flash-image and gemini-nano-banana-2.1 cost 4 quota. gemini-3-pro-image costs 6. There is no size or 4K price. If aspect_ratio is omitted and a reference image is sent, output follows that image.",
+        "description": "Gemini image models. Do not send size. If aspect_ratio is omitted and a reference image is sent, output follows that image.",
         "properties": {
           "model": {
             "type": "string",
@@ -1241,11 +1241,7 @@
                 "id": { "type": "string", "example": "gemini-3.1-flash-image" },
                 "object": { "type": "string", "example": "model" },
                 "description": { "type": "string" },
-                "params": { "type": "array", "items": { "type": "object" } },
-                "price": {
-                  "type": "object",
-                  "description": "Default quota. GPT uses standard and hd. Midjourney uses relaxed, fast, and fast_hd. Grok and Gemini use standard."
-                }
+                "params": { "type": "array", "items": { "type": "object" } }
               }
             }
           }
