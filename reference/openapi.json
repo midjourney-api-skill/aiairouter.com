@@ -52,7 +52,7 @@
         "tags": ["Chat"],
         "operationId": "createChatCompletion",
         "summary": "Create chat completion",
-        "description": "OpenAI-compatible chat completion. A successful call returns the completion JSON, or an SSE stream when `stream` is true.<br /><br />Auth: `Authorization: Bearer YOUR_API_KEY`, a raw `Authorization` value, or an `API-KEY` header. A `Bearer` prefix is stripped. The key IP allowlist still applies.<br /><br />`model` is required. Any other model returns HTTP 400 with `error` set to `This model is temporarily not supported.`<br /><br />Quota must be greater than 5 before the call. Otherwise the response is HTTP 402 and the body is `{ \"status\": 1001, \"code\": 1001, \"message\": \"Quota must be greater than 5.\" }`. A missing or invalid key is HTTP 401. An IP that is not allowed is HTTP 403. After a billed call, quota is deducted from token usage and the balance may go negative. The request is logged immediately. The token bill is filled in when it becomes available. A call whose bill never arrives stays in the log with zero quota and is not deducted.",
+        "description": "OpenAI-compatible chat completion. A successful call returns the completion JSON, or an SSE stream when `stream` is true.<br /><br />Auth: `Authorization: Bearer YOUR_API_KEY`, a raw `Authorization` value, or an `API-KEY` header. A `Bearer` prefix is stripped. The key IP allowlist still applies.<br /><br />`model` is required. Any other model returns HTTP 400 with `error` set to `This model is temporarily not supported.`<br /><br />Prices are USD per 1 million tokens. The charged price is the list price multiplied by the model discount. Cached input uses the cache price. 1 USD = 130 quota. When prompt tokens exceed the long-context threshold, input and cache are multiplied by 2 and output by 1.5 before the discount.<br />gpt-6.1-sol: input 2, cache 0.10, output 10, discount 0.18, long context above 272000.<br />gpt-6.1-terra: input 1, cache 0.05, output 5, discount 0.15, long context above 272000.<br />gpt-6-sol: input 2, cache 0.20, output 10, discount 0.18, long context above 272000.<br />gpt-6-astra: input 10, cache 1, output 50, discount 0.22, long context above 272000.<br />gpt-6-luna: input 0.10, cache 0.01, output 0.50, discount 0.45, long context above 272000.<br />gpt-5.6-sol: input 5, cache 0.50, output 30, discount 0.18, long context above 272000.<br />grok-4.7: input 2, cache 0.5, output 6, discount 0.13, long context above 200000.<br />grok-4.6: input 2, cache 0.5, output 6, discount 0.13, long context above 200000.<br />claude-opus-5-5: input 4, cache 0.2, output 20, discount 0.25.<br />claude-sonnet-5-5: input 2, cache 0.1, output 10, discount 0.25.<br />claude-opus-5: input 5, cache 0.5, output 25, discount 0.25.<br />claude-sonnet-5: input 2, cache 0.2, output 10, discount 0.25.<br />claude-opus-4-8: input 5, cache 0.5, output 25, discount 0.25.<br />claude-opus-4-7: input 5, cache 0.5, output 25, discount 0.25.<br /><br />Quota must be greater than 5 before the call. Otherwise the response is HTTP 402 and the body is `{ \"status\": 1001, \"code\": 1001, \"message\": \"Quota must be greater than 5.\" }`. A missing or invalid key is HTTP 401. An IP that is not allowed is HTTP 403. After a billed call, quota is deducted from token usage and the balance may go negative. The request is logged immediately. The token bill is filled in when it becomes available. A call whose bill never arrives stays in the log with zero quota and is not deducted.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1303,7 +1303,15 @@
               "gpt-6-sol",
               "gpt-6-astra",
               "gpt-6-luna",
-              "gpt-5.6-sol"
+              "gpt-5.6-sol",
+              "grok-4.7",
+              "grok-4.6",
+              "claude-opus-5-5",
+              "claude-sonnet-5-5",
+              "claude-opus-5",
+              "claude-sonnet-5",
+              "claude-opus-4-8",
+              "claude-opus-4-7"
             ],
             "example": "gpt-6-sol"
           },
